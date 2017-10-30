@@ -240,7 +240,7 @@ def resize_activations(v, si, so):
 
 #----------------------------------------------------------------------------
 # Resolution selector for fading in new layers during progressive growing.
-
+from theano.ifelse import ifelse
 class LODSelectLayer(lasagne.layers.MergeLayer):
     def __init__(self, incomings, cur_lod, first_incoming_lod=0, ref_idx=0, **kwargs):
         super(LODSelectLayer, self).__init__(incomings, **kwargs)
@@ -258,9 +258,9 @@ class LODSelectLayer(lasagne.layers.MergeLayer):
         t = self.cur_lod - self.first_incoming_lod
         r = v[hi]
         for i in xrange(hi-1, lo-1, -1): # i = hi-1, hi-2, ..., lo
-            r = theano.ifelse.ifelse(T.lt(t, i+1), v[i] * ((i+1)-t) + v[i+1] * (t-i), r)
+            r = ifelse(T.lt(t, i+1), v[i] * ((i+1)-t) + v[i+1] * (t-i), r)
         if lo < hi:
-            r = theano.ifelse.ifelse(T.le(t, lo), v[lo], r)
+            r = ifelse(T.le(t, lo), v[lo], r)
         return r
 
 #----------------------------------------------------------------------------
